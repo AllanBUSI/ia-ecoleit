@@ -1,16 +1,17 @@
 import cv2
 import numpy as np
+from utils import ReadFolder, ReadFolderIndex
+import os
 
 
-# creer une function de néttoyage pour que les images puisse etre traiter et avoir un filtre et une rotation
-def clean_up(image, deg):
-    cv2.namedWindow('image')
-    # cv2.createTrackbar('val', 'image', 0, 255, nothing) 
-    # cv2.createTrackbar('threshold', 'image', 0, 100, nothing)
+def CleanUp(basename):
+    listName = ReadFolder(basename)
+    for indice, element in enumerate(listName):
+        list = ReadFolder(basename+"/"+element)
+    return list, listName
+
+def ImgTri(name, image, imgd, deg, level):
     img = cv2.imread(image)  
-    
-    print(img)
-
     while True:
         height, width = img.shape[:2]
         (cX, cY) = (width // 2, height // 2)
@@ -18,20 +19,27 @@ def clean_up(image, deg):
         for i in range(height):
             for j in range(width):
                 if np.random.randint(2) == 0:
-                    gray[i, j] = min(gray[i, j] + np.random.randint(0,1), 255) # adding noise to image and setting values > 255 to 255. 
+                    gray[i, j] = min(gray[i, j] + np.random.randint(0,1), level) # adding noise to image and setting values > 255 to 255. 
                 else:
                     gray[i, j] = max(gray[i, j] - np.random.randint(0,1), 0) # subtracting noise to image and setting values < 0 to 0.
-        cv2.imshow('Original', img)
-        cv2.imshow('image', gray)
-        
-        M = cv2.getRotationMatrix2D((cX, cY), 45, 1.0)
+                    
+        M = cv2.getRotationMatrix2D((cX, cY), deg, 1.0)
         rotated = cv2.warpAffine(gray, M, (width, height))
-        
         cv2.imshow('rotate', rotated)
-
+        contents = os.listdir('clean')
+        if not os.path.exists("clean/" + name):
+            os.makedirs("clean/" + name)
+                        
+        cv2.imwrite("clean/"+name+"/p-{:d}-{:d}-{:d}.png".format(imgd, deg, level),rotated)
+        cv2.destroyAllWindows()
+        break
         
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    cv2.destroyAllWindows()
-    
-clean_up('image/allan/p-0.png', 3)
+a = CleanUp('image')
+
+for i, v in enumerate(a[1]):
+    print(i)
+    for j, k in enumerate(a[0]):
+        for deg in range(361):
+            for level in range(256):
+                if deg % 15 == 0 and level % 102 == 0:
+                    ImgTri(a[1][i], 'image/'+a[1][i]+"/"+a[0][j],j, deg, level)
