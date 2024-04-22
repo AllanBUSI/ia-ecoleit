@@ -33,6 +33,7 @@ while True:
         id+=1
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 0, 255), 2)
     # on affiche l'image
+
     cv2.imshow('video', frame)
     key=cv2.waitKey(1)&0xFF
     if key==ord('q'):
