@@ -41,5 +41,5 @@ for i, v in enumerate(a[1]):
     for j, k in enumerate(a[0]):
         for deg in range(361):
             for level in range(256):
-                if deg % 15 == 0 and level % 102 == 0:
+                if deg % 60 == 0 and level % 128 == 0:
                     ImgTri(a[1][i], 'image/'+a[1][i]+"/"+a[0][j],j, deg, level)
